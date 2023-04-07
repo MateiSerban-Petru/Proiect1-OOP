@@ -1,0 +1,102 @@
+#include <iostream>
+using namespace std;
+class Vector {
+private:
+    int size;
+    int *array;
+public:
+    Vector(int size_, int val = 0) : size{size_}, array{new int[size_]} {
+        for(int i = 0; i < size_; i++) array[i] = val;
+    }
+    Vector(Vector &v) : size{v.getSize()}, array{new int[v.getSize()]} {
+        for(int i = 0; i < v.getSize(); i++) array[i] = v.getElementByIndex(i);
+    }
+    Vector& operator=(Vector& v) {
+        setSize(v.getSize());
+        delete[] array;
+        setArray(new int[getSize()]);
+        for(int i = 0; i < v.getSize(); i++) array[i] = v.getElementByIndex(i);
+    }
+
+    void resize(int newSize, int val = 0) {
+        setSize(newSize);
+        delete[] array;
+        setArray(new int[newSize]);
+        for(int i = 0; i < getSize(); i++) array[i] = val;
+    }
+
+    int getSum() {
+        int sum = 0;
+        for(int i = 0; i < getSize(); i++) sum += array[i];
+        return sum;
+    }
+
+    // getMax().first va fi valoarea maxima
+    // iar getMax().second va fi primul index la care apare valoarea maxima
+    std::pair<int, int> getMax() {
+        int maxIdx = 0;
+        for(int i = 0; i < getSize(); i++) if(array[i] > array[maxIdx]) maxIdx = i;
+        return {array[maxIdx], maxIdx};
+    }
+    void sortare() {
+        for (int i = 0; i < getSize(); i++)
+            for (int j = i + 1 ; j < getSize(); j++)
+                if (array[j] < array[i]) {
+                    int aux = array[j];
+                    array[j] = array[i];
+                    array[i] = aux;
+                }
+    }
+
+    friend ostream& operator<<(ostream& os, Vector& v) { // afiseaza vectorul
+        os << '[';
+        for(int i = 0; i < v.getSize() - 1; i++) os << v.getElementByIndex(i) << ", ";
+        os << v.getElementByIndex(v.getSize() - 1) << ']';
+    }
+    friend Vector& operator>>(istream& os, Vector &v) { // afiseaza vectorul
+        int sz;
+        os >> sz;
+        v.resize(sz);
+        for(int i = 0; i < v.getSize() ; i++) {
+            int x;
+            os >> x;
+            v.setElementByIndex(i, x);
+        }
+    }
+
+    int getSize() { return size; } // getter pentru size
+    void setSize(int n) { size = n; } // setter pentru size
+    int getElementByIndex(int idx) {
+        if(idx >= getSize()) return -1000000; // ar trebui sa fie o eroare aici
+        return array[idx];
+    };
+    void setElementByIndex(int idx, int val) {
+        if(idx >= getSize()) return;
+        array[idx] = val;
+    }
+
+    int* getArray() { return array; };
+    void setArray(int* arr) {array = arr; };
+
+    ~Vector() { delete[] array; } // la stergere se starge complet array-ul
+};
+
+
+
+int main() {
+    cout << "Numarul de vectori n=";
+    int n;
+    cin >> n;
+    for(int i = 1; i <= n; i++) {
+        Vector *v = new Vector(1);
+        cout << "Vectorul(marimea + elementele)=";
+        cin >> *v;
+        cout << "Vectorul este: " << *v << '\n';
+        cout << "Suma este: " << v->getSum() << '\n';
+        pair<int, int> mx = v->getMax();
+        cout << "Maximul este " << mx.first << " si se gaseste pe pozitia " << mx.second << '\n';
+        v->sortare();
+        cout << "Vectorul sortat este: " << *v <<'\n';
+        delete v;
+    }
+}
